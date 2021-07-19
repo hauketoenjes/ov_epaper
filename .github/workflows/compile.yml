@@ -1,0 +1,38 @@
+name: Dart build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*.*.*'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            output-name: ov-linux
+          - os: macOS-latest
+            output-name: ov-mac
+          - os: windows-latest
+            output-name: ov-windows.exe
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+      - name: Install dependencies
+        run: dart pub get
+      - name: Create build directory
+        run: mkdir build
+      - name: Compile exe
+        run: dart compile exe bin/ov_epaper.dart -o build/${{ matrix.output-name }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: executables
+          path: build
