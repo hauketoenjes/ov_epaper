@@ -21,10 +21,16 @@ class EPaper {
     required this.dateTime,
   });
 
+  ///
+  /// Delete image folder
+  ///
   Future<void> deleteImages() async {
     await directory.delete(recursive: true);
   }
 
+  ///
+  /// Combine all image tiles into a pdf
+  ///
   Future<File> generatePdf() async {
     final pdf = Document();
 
@@ -84,21 +90,30 @@ class EPaper {
     return file;
   }
 
+  ///
+  /// Download all page-tile-images and save it into a temporary directory
+  ///
   Future<void> downloadPaperTiles() async {
     directory = await Directory.current.createTemp('images-');
     for (int page = 1; page <= maxPages; page++) {
-      for (final url in _getTileUrls(page)) {
-        try {
-          final response = await dio.download(
-            url,
-            '${directory.path}${'/$page/${url.split('/').last}'}',
-          );
+      // Get tile URL's for current page
+      final tileUrls = _getTileUrls(page);
 
-          if (response.isRedirect ?? false) break;
-        } catch (e) {
-          // If there is an error we should be at the end of the paper
-          return;
-        }
+      // Collect download futures
+      final futures = tileUrls.map(
+        (url) => dio.download(
+          url,
+          '${directory.path}${'/$page/${url.split('/').last}'}',
+        ),
+      );
+
+      // Execute all futures in parallel.
+      // Use eagerError to instantly interrupt, if one Future fails
+      try {
+        await Future.wait(futures, eagerError: true);
+      } catch (e) {
+        // If there is an error we should be at the end of the paper
+        return;
       }
 
       pages++;
@@ -133,10 +148,17 @@ class EPaper {
   }
 
   String _getImageUrl(int pageNum, int x, int y, {int? value}) {
+    // Left pad page number with zeros (1 -> 01)
     final page = pageNum.toString().padLeft(2, '0');
+
+    // Return image url with date, aValue and tile x/y
     return 'https://oldenburgische-volkszeitung.de/lib/epaper/img/${dateTime.year}/${_tilePathDateFormat.format(dateTime)}-ov/tiles/a${value ?? aValue}-${_tileDateFormat.format(dateTime)}-ov-$page-_$page-4c-hp/2-$x-$y.jpg';
   }
 
+  ///
+  /// Generates all image tile url in the highest resolution
+  /// One page has 4*6 = 24 tiles / images
+  ///
   List<String> _getTileUrls(int pageNum) {
     final List<String> out = [];
     for (int x = 0; x <= 3; x++) {
