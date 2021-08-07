@@ -6,7 +6,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 class EPaper {
-  static const int maxPages = 40;
+  static const int maxPages = 60;
 
   final _tilePathDateFormat = DateFormat('yyyyMMdd');
   final _tileDateFormat = DateFormat('yy-MM-dd');
