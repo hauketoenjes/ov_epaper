@@ -50,5 +50,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            executables/*
+            executables/ov-linux
+            executables/ov-mac
+            executables/ov-windows.exe
       
