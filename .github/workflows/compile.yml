@@ -13,18 +13,26 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macOS-latest, ARM]
         include:
           - os: ubuntu-latest
             output-name: ov-linux
+            arch: x64
+          - os: ARM
+            output-name: ov-linux-arm
+            arch: arm
           - os: macOS-latest
             output-name: ov-mac
+            arch: x64
           - os: windows-latest
             output-name: ov-windows.exe
+            arch: x64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
+        with:
+          architecture: ${{ matrix.arch }}
       - name: Install dependencies
         run: dart pub get
       - name: Create build directory
@@ -51,6 +59,7 @@ jobs:
         with:
           files: |
             ov-linux
+            ov-linux-arm
             ov-mac
             ov-windows.exe
       
