@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macOS-latest, ARM64]
         include:
           - os: ubuntu-latest
             output-name: ov-linux
@@ -21,6 +21,8 @@ jobs:
             output-name: ov-mac
           - os: windows-latest
             output-name: ov-windows.exe
+          - os: ARM64
+            output-name: ov-linux-arm64
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
