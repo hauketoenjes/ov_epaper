@@ -2,6 +2,14 @@
 
 Das CLI Tool downloaded die aktuell Ausgabe (oder ältere Ausgaben) der [Oldenburgischen Volkszeitung (OV)](https://oldenburgische-volkszeitung.de/epaper-archiv.php) aus dem ePaper Archiv und generiert ein PDF daraus.
 
+## Wie benutzt man das Tool?
+
+Es gibt zwei Möglichkeiten das Tool zu verwenden. Man kann den Code herunterladen und ausführen (wozu man dart etc. installieren muss) oder man benutzt die binaries, die von GitHub automatisch gebaut werden: 
+
+1. Die Binary für macOS, Windows oder Linux vom aktuellen Release herunterladen: https://github.com/hauketoenjes/ov_epaper/releases (`ov-mac`, `ov-linux` oder `ov-windows.exe`)
+2. Unter Linux muss die Datei noch ausführbar gemacht werden: `chmod +x ov-linux`
+3. Danach kann man das Tool ausführen und eine Ausgabe zum Download auswählen.
+
 ## Warum funktioniert das?
 Das Tool basiert darauf, dass die OV einzelne Bilddateien nutzt, um die Zeitung im Web hinter einem Login anzuzeigen. Aus diesen Bilddateien wird dann eine Seite der Zeitung zusammengebaut. Das Interessante ist, dass die Download URL's für die Bilder ohne Login oder Token erreichbar sind. Grundsätzlich ist das kein Problem, diese URL's sind aber vorhersagbar:
 
