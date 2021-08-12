@@ -15,6 +15,10 @@ class EPaper {
   late final Directory directory;
   late int aValue;
 
+  // vp happende once until now. Im not really sure when its hp or vp.
+  final List<String> possibleCombinations = ['hp', 'vp'];
+  late String charCombination;
+
   int pages = 0;
 
   EPaper({
@@ -121,25 +125,31 @@ class EPaper {
   }
 
   ///
-  /// Tries to find the download url to [dateTime]. Sets [aValue] and return true
-  /// if successfull.
+  /// Tries to find the download url to [dateTime]. Sets [aValue], [charCombination]
+  /// and return true if successfull.
   ///
-  /// [getImageUrl] can be used without [value] after this method completed successfully.
+  /// [getImageUrl] can be used without [possibleAvalue] and [possibleCharCombination]
+  /// after this method completed successfully. Otherwise using it is unsafe, because
+  /// the variables are late.
   ///
   Future<bool> findDownloadURL() async {
     for (int v = 15; v <= 17; v++) {
-      try {
-        // Try to get Ressource with value v
-        final response = await dio.get(_getImageUrl(1, 0, 0, value: v));
+      for (final c in possibleCombinations) {
+        try {
+          // Try to get Ressource with value v
+          final response = await dio.get(_getImageUrl(1, 0, 0,
+              possibleAvalue: v, possibleCharCombination: c));
 
-        // If the request is successfull und not redirected, set aValue to current v
-        // and complete future with true
-        if (response.statusCode == 200 && !(response.isRedirect ?? false)) {
-          aValue = v;
-          return true;
+          // If the request is successfull und not redirected, set aValue to current v
+          // and complete future with true
+          if (response.statusCode == 200 && !(response.isRedirect ?? false)) {
+            aValue = v;
+            charCombination = c;
+            return true;
+          }
+        } catch (e) {
+          // We dont want to handle the exception because we are expecting some errors
         }
-      } catch (e) {
-        // We dont want to handle the exception because we are expecting some errors
       }
     }
 
@@ -147,12 +157,13 @@ class EPaper {
     return false;
   }
 
-  String _getImageUrl(int pageNum, int x, int y, {int? value}) {
+  String _getImageUrl(int pageNum, int x, int y,
+      {int? possibleAvalue, String? possibleCharCombination}) {
     // Left pad page number with zeros (1 -> 01)
     final page = pageNum.toString().padLeft(2, '0');
 
-    // Return image url with date, aValue and tile x/y
-    return 'https://oldenburgische-volkszeitung.de/lib/epaper/img/${dateTime.year}/${_tilePathDateFormat.format(dateTime)}-ov/tiles/a${value ?? aValue}-${_tileDateFormat.format(dateTime)}-ov-$page-_$page-4c-hp/2-$x-$y.jpg';
+    // Return image url with date, aValue, charCombination and tile x/y
+    return 'https://oldenburgische-volkszeitung.de/lib/epaper/img/${dateTime.year}/${_tilePathDateFormat.format(dateTime)}-ov/tiles/a${possibleAvalue ?? aValue}-${_tileDateFormat.format(dateTime)}-ov-$page-_$page-4c-${possibleCharCombination ?? charCombination}/2-$x-$y.jpg';
   }
 
   ///
