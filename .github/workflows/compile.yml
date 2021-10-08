@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - uses: hauketoenjes/setup-dart@595006e5ac50932c2509f1697521161acd5e3305
+      - uses: dart-lang/setup-dart@7e4ec4f1811e09ce8f339b4d3044220ca799e6c6
         with:
           architecture: ${{ matrix.arch }}
       - name: Install dependencies
